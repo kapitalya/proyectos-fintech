@@ -1,109 +1,89 @@
-# 📈 Análisis de Portafolio de Activos — Mercado LATAM
+# Proyectos Fintech — análisis cuantitativo (notebooks)
 
-![Python](https://img.shields.io/badge/Python-3.10-3776AB?style=flat&logo=python&logoColor=white)
-![Jupyter](https://img.shields.io/badge/Jupyter-Notebook-F37626?style=flat&logo=jupyter&logoColor=white)
-![pandas](https://img.shields.io/badge/pandas-2.1-150458?style=flat&logo=pandas&logoColor=white)
-![scipy](https://img.shields.io/badge/scipy-1.11-8CAAE6?style=flat)
-![Status](https://img.shields.io/badge/Estado-Activo-brightgreen)
+> Tres notebooks de análisis financiero y crediticio con datos abiertos (portafolio, inflación de Bolivia y scoring de crédito). Para analistas y estudiantes de finanzas cuantitativas.
 
-Análisis cuantitativo de riesgo/retorno sobre activos financieros representativos del mercado latinoamericano. Aplica teoría de portafolio de Markowitz y simulación Monte Carlo para identificar la asignación óptima de activos.
+**Estado (2026-11-17):** PARCIAL — tres notebooks y un script de descarga presentes; sin `requirements.txt`, `.gitignore` ni licencia; los notebooks no tienen outputs guardados, así que sus resultados no son verificables en el repo; `datos/` no está incluido (lo genera `descargar_datos.py`, salvo `cs-training.csv`, que hay que colocar a mano).
+**Repo:** kapitalya/proyectos-fintech · **Rama por defecto:** main · **Alias/nombres anteriores:** el README anterior citaba una carpeta `portafolio-acciones-bolivia/` que no existe en este repo.
 
----
+> Aviso: análisis educativo, no es consejo financiero. Markowitz, VaR y Monte Carlo son ejercicios ilustrativos; no recomiendan ninguna inversión.
 
-## 🎯 Problema
+## Qué hace
 
-Un inversor boliviano con acceso a ETFs internacionales necesita responder:
-- ¿Qué activos ofrecen mejor retorno ajustado al riesgo?
-- ¿Cómo diversificar para reducir volatilidad sin sacrificar retorno?
-- ¿Cuánto puedo perder en un día malo (VaR)?
+- `analisis_portafolio.ipynb`: descarga precios con `yfinance` (diccionario `TICKERS`, con los ETF ILF, EEM, GLD, SLV e IEF según el README anterior; lista exacta sin verificar en el notebook). Calcula retornos logarítmicos, Sharpe, VaR, prueba Jarque-Bera, simulación Monte Carlo (`N_SIMULACIONES = 20_000`) y frontera eficiente.
+- `inflacion_bolivia_sarima.ipynb`: lee `datos/inflacion_anual_bolivia.csv`, aplica pruebas ADF, KPSS y Ljung-Box, descomposición estacional, filtro HP, ACF/PACF y búsqueda por AIC de parámetros SARIMAX.
+- `scoring_credito.ipynb`: lee `datos/cs-training.csv` (no incluido), entrena regresión logística, Random Forest y Gradient Boosting, calcula AUC-ROC y Average Precision, y una curva de calibración.
+- `descargar_datos.py`: descarga desde la API del Banco Mundial el indicador `FP.CPI.TOTL.ZG` (inflación anual de Bolivia, 2000–2024) y guarda `datos/inflacion_anual_bolivia.csv`. Contiene además una función de IPC mensual (indicador `FP.CPI.TOTL`) que no guarda ningún archivo.
 
----
+## Stack
 
-## 📐 Metodología
+Python. Librerías importadas por los notebooks y el script: `numpy`, `pandas`, `scipy`, `matplotlib`, `seaborn`, `yfinance` (portafolio); `statsmodels` (inflación); `scikit-learn` (scoring); `requests` (script de descarga). Jupyter Notebook.
 
-| Técnica | Descripción | Por qué |
-|---|---|---|
-| **Retornos logarítmicos** | `ln(P_t / P_{t-1})` | Aditivos en el tiempo, mejor comportamiento estadístico |
-| **Sharpe Ratio** | `(R - Rf) / σ` | Mide retorno por unidad de riesgo asumido |
-| **VaR paramétrico 95%** | Pérdida máxima diaria esperada | Cuantifica riesgo de cola |
-| **Monte Carlo (20k portafolios)** | Pesos aleatorios normalizados | Mapea espacio completo riesgo/retorno |
-| **Frontera eficiente** | Portafolios óptimos de Markowitz | Identifica la mejor combinación posible |
-
----
-
-## 📊 Activos Analizados
-
-| Ticker | Instrumento | Exposición |
-|---|---|---|
-| `ILF` | iShares Latin America 40 ETF | Acciones LATAM top 40 |
-| `EEM` | iShares MSCI Emerging Markets | Mercados emergentes globales |
-| `GLD` | SPDR Gold ETF | Oro — activo refugio |
-| `SLV` | iShares Silver ETF | Plata — commodity industrial |
-| `IEF` | iShares 7-10 Year Treasury | Renta fija USA |
-
-> Estos activos son accesibles desde Bolivia vía brokers internacionales y sirven como referencia para análisis de diversificación regional.
-
----
-
-## 📁 Estructura
+## Estructura
 
 ```
-portafolio-acciones-bolivia/
-├── analisis_portafolio.ipynb   # Notebook principal — análisis completo
-├── requirements.txt
-├── .gitignore
-├── img/                        # Gráficas exportadas (generadas al correr)
-│   ├── 01_precios_y_distribuciones.png
-│   ├── 02_correlaciones.png
-│   └── 03_frontera_eficiente.png
+proyectos-fintech/
+├── analisis_portafolio.ipynb        # Portafolio: Markowitz, VaR, Monte Carlo
+├── inflacion_bolivia_sarima.ipynb   # Inflación Bolivia (SARIMA)
+├── scoring_credito.ipynb            # Scoring crediticio (requiere datos/cs-training.csv)
+├── descargar_datos.py               # Descarga inflación Bolivia (Banco Mundial) a datos/
+├── mnt/                             # Artefactos de sandbox con READMEs anidados (no forman parte del proyecto)
 └── README.md
 ```
 
----
+`datos/` e `img/` no existen en el repo: los crea `descargar_datos.py` (`datos/`) o el usuario. La carpeta `mnt/user-data/outputs/` contiene READMEs anidados que describen otro proyecto; se conservan sin cambios en este PR.
 
-## ⚙️ Instalación
+## Instalación y uso
 
 ```bash
-git clone https://github.com/Serius69/portafolio-acciones-bolivia
-cd portafolio-acciones-bolivia
+git clone https://github.com/kapitalya/proyectos-fintech
+cd proyectos-fintech
 
 python -m venv venv
-source venv/bin/activate      # Linux/Mac
-# venv\Scripts\activate       # Windows
+source venv/bin/activate          # Windows: venv\Scripts\activate
+pip install numpy pandas scipy matplotlib seaborn yfinance statsmodels scikit-learn requests jupyter   # sin requirements.txt: versiones sin fijar
 
-pip install -r requirements.txt
-mkdir img
-
+python descargar_datos.py         # crea datos/inflacion_anual_bolivia.csv
 jupyter lab analisis_portafolio.ipynb
 ```
 
-Ejecutar todas las celdas en orden. Los datos se descargan automáticamente desde Yahoo Finance.
+- `analisis_portafolio.ipynb` descarga precios de Yahoo Finance al ejecutarse; no necesita archivos locales.
+- `inflacion_bolivia_sarima.ipynb` requiere antes `python descargar_datos.py`.
+- `scoring_credito.ipynb` requiere colocar `datos/cs-training.csv` manualmente. El origen del archivo no está en el repo (sin verificar; el nombre corresponde al dataset Give Me Some Credit).
 
----
+Ejecutar las celdas en orden. Sin verificar: que los notebooks corran sin errores con las versiones actuales de las librerías.
 
-## 📈 Resultados Esperados
+## Variables de entorno (solo nombres)
 
-El notebook genera tres visualizaciones:
+Ninguna. No hay `.env.example` en el repo y ningún script lee variables de entorno.
 
-**1. Evolución de precios normalizados + distribución de retornos**
-Muestra el comportamiento histórico de cada activo y si sus retornos siguen una distribución normal (test Jarque-Bera).
+## Pruebas y CI
 
-**2. Matriz de correlaciones**
-Identifica qué activos se mueven juntos y dónde hay oportunidad real de diversificación.
+- Sin pruebas automatizadas ni workflows de CI en el repo.
 
-**3. Frontera eficiente (Monte Carlo)**
-20,000 portafolios simulados coloreados por Sharpe Ratio. Marca el portafolio de máximo Sharpe (⭐) y mínima volatilidad (◆).
+### Resultados
 
----
+- Los notebooks no tienen outputs guardados. Calculan AUC-ROC, Average Precision, Sharpe, VaR y la frontera eficiente, pero sus valores no se pueden verificar desde el repo. Las cifras del README anterior (AUC ~0.856 / ~0.866 en scoring) se retiran.
+- Resultados no verificables en el repo; para reproducirlos, ejecutar los notebooks.
 
-## 🔗 Contexto Bolivia
+## Despliegue
 
-Bolivia no tiene mercado de valores desarrollado (la BBV tiene liquidez muy baja). Este análisis usa ETFs internacionales como proxy para estudiar diversificación desde el contexto boliviano, donde el dólar paralelo y la inflación hacen especialmente relevante el análisis de activos refugio como GLD.
+No aplica: notebooks y scripts de ejecución local.
 
-Ver también: [💱 Dólar Paralelo Bolivia — ARIMA](https://github.com/Serius69/dolar-paralelo-bolivia-arima)
+## Estado y relaciones
 
----
+- Repositorio independiente. Agrupa tres análisis distintos (portafolio, inflación, scoring); separarlos en repos propios está pendiente de decisión del dueño.
+- El README anterior enlazaba `Serius69/dolar-paralelo-bolivia-arima`, repo de una cuenta personal fuera de la organización; no auditado en este corte.
 
-## 👤 Autor
+## Precios y planes
 
-**Sergio** — Data Scientist en Finanzas | [github.com/Serius69](https://github.com/Serius69)
+No aplica (repositorio de análisis, sin venta). Precios y planes: fuente única `Vault/EMPRESA/portafolio/PRECIOS-APROBADOS-20261108.md`.
+
+## Seguridad, privacidad y derechos
+
+- Sin secretos en el repo.
+- Fuentes de datos: Yahoo Finance (vía `yfinance`), API del Banco Mundial y el dataset de `cs-training.csv`. Cada una sujeta a sus términos de uso; no verificados en este corte.
+- Licencia: el repo no tiene archivo LICENSE; no hay derechos de reutilización declarados.
+
+## Convenciones de trabajo
+
+Cambios por rama `codex/*` y PR contra `main` (el repo no tiene rama `develop`). CI: no hay workflows configurados.
